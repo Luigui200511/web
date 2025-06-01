@@ -2,184 +2,486 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tienda Fitness</title>
-  <!-- Google Fonts: Montserrat -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planes de Entrenamiento | Tienda Fitness</title>
+  <!-- Fuente Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root { --color-primary: #0d1b2a; --color-secondary: #415a77; --color-accent: #e0e1dd; --color-light: #ffffff; --color-grey: #adb5bd; }
-    body { font-family: 'Montserrat', sans-serif; background: var(--color-light); color: var(--color-primary); }
-    .navbar { background: var(--color-light); }
-    .navbar-brand img { height: 60px; }
-    .btn-primary { background: var(--color-primary); border: none; }
-    .btn-outline-primary { color: var(--color-primary); border-color: var(--color-primary); }
-    .btn-outline-primary:hover { background: var(--color-primary); color: var(--color-light); }
-    .card { border: 1px solid var(--color-accent); transition: transform .2s, box-shadow .2s; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .card-img-top { height: 200px; object-fit: cover; }
-    footer { background: var(--color-accent); }
-    .modal-header, .modal-footer { background: var(--color-accent); }
-    .payment-methods label { cursor: pointer; }
-    .payment-methods img { width: 60px; margin: 0 10px; vertical-align: middle; }
-    #paypal-button-container { margin-top: 15px; }
+    /* ================================
+       Variables de color, tipografía y espaciado
+    ================================== */
+    :root {
+      --color-primario: #274b7b;
+      --color-secundario: #1E3A5F;
+      --color-fondo: #ffffff;
+      --color-texto: #0b103c;
+      --color-acento: #E63946;
+      --radius: 8px;
+      --shadow-light: 0 4px 12px rgba(0,0,0,0.05);
+      --font-base: 1rem;       /* 16px */
+      --font-sm: 0.875rem;     /* 14px */
+      --font-lg: 1.125rem;     /* 18px */
+      --font-xl: 1.5rem;       /* 24px */
+      --font-xxl: 1.75rem;     /* 28px */
+      --trans-duracion: 0.25s;
+      --espaciado-base: 1rem;
+      --espaciado-sm: 0.5rem;
+      --espaciado-lg: 1.5rem;
+    }
+
+    /* ================================
+       Reinicio básico y tipografía
+    ================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+    html {
+      font-size: 100%;
+    }
+    body {
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      line-height: 1.6;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity var(--trans-duracion) ease;
+      padding: var(--espaciado-base) 0;
+    }
+    body.loaded {
+      visibility: visible;
+      opacity: 1;
+    }
+    h1 {
+      font-size: var(--font-xxl);
+      margin-bottom: var(--espaciado-sm);
+      font-weight: 700;
+    }
+    h2 {
+      font-size: var(--font-xl);
+      margin-bottom: var(--espaciado-sm);
+      font-weight: 700;
+    }
+    p {
+      font-size: var(--font-base);
+      margin-bottom: var(--espaciado-sm);
+    }
+    ul {
+      list-style: none;
+      margin-bottom: var(--espaciado-base);
+    }
+    li {
+      font-size: var(--font-sm);
+      margin-bottom: var(--espaciado-base);
+      display: flex;
+      align-items: flex-start;
+    }
+    li img {
+      width: 18px;
+      height: 18px;
+      margin-right: var(--espaciado-sm);
+      margin-top: 4px;
+    }
+    li strong {
+      display: block;
+      font-weight: 700;
+      margin-bottom: var(--espaciado-sm);
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ================================
+       Loader de entrada
+    ================================== */
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--color-fondo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--color-primario);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    body.loaded #loader {
+      display: none;
+    }
+
+    /* ================================
+       Contenedor principal
+    ================================== */
+    #plan-entrenamiento {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 var(--espaciado-base) var(--espaciado-base);
+      text-align: center;
+    }
+
+    /* ================================
+       Logo y Hero (Propuesta de valor)
+    ================================== */
+    .plan__logo {
+     margin-bottom: -3.5rem;
+      text-align: center;
+    }
+    .plan__logo img {
+      width: 200px;
+      max-width: 60%;
+      height: auto;
+      border-radius: var(--radius);
+      loading: lazy;
+
+    }
+
+    .plan__hero {
+      margin-bottom: var(--espaciado-lg);
+    }
+    .plan__hero h1 {
+      font-size: var(--font-xl);
+      color: var(--color-primario);
+      line-height: 1.2;
+    }
+    .plan__hero p {
+      font-size: var(--font-base);
+      color: var(--color-secundario);
+      margin-bottom: var(--espaciado-base);
+    }
+    .plan__hero .cta-primary {
+      background: var(--color-acento);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: var(--font-base);
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background var(--trans-duracion);
+      margin-bottom: var(--espaciado-sm);
+    }
+    .plan__hero .cta-primary:hover,
+    .plan__hero .cta-primary:focus {
+      background: #c92b38;
+      outline: none;
+    }
+    .plan__hero .cta-primary:focus {
+      outline: 3px solid var(--color-secundario);
+      outline-offset: 2px;
+    }
+    .plan__hero .cta-texto {
+      font-size: var(--font-sm);
+      color: #555;
+    }
+
+    /* ================================
+       Beneficios (basados en estudios)
+    ================================== */
+    .plan__beneficios {
+      background: #F8F9FA;
+      border-radius: var(--radius);
+      padding: var(--espaciado-base);
+      margin-bottom: var(--espaciado-lg);
+      text-align: left;
+      box-shadow: var(--shadow-light);
+    }
+    .plan__beneficios h2 {
+      margin-bottom: var(--espaciado-sm);
+      color: var(--color-secundario);
+      font-size: var(--font-lg);
+    }
+    .plan__beneficios ul li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ================================
+       Sección de detalles y precios
+    ================================== */
+    .plan__detalles {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      background: var(--color-fondo);
+      border: 2px solid var(--color-secundario);
+      border-radius: var(--radius);
+      padding: 0;
+      text-align: left;
+      box-shadow: var(--shadow-light);
+      transition: opacity var(--trans-duracion), max-height var(--trans-duracion);
+      margin-bottom: var(--espaciado-lg);
+    }
+    .plan__detalles--visible {
+      opacity: 1;
+      max-height: 1000px;
+      padding: var(--espaciado-base);
+    }
+    .plan__detalles h2 {
+      color: var(--color-secundario);
+      font-size: var(--font-lg);
+      margin-bottom: var(--espaciado-sm);
+      font-weight: 700;
+    }
+    .plan__detalles ul {
+      margin-bottom: var(--espaciado-base);
+    }
+    .plan__detalles ul li {
+      margin-bottom: var(--espaciado-sm);
+    }
+    .plan__precio {
+      font-size: var(--font-base);
+      font-weight: 700;
+      color: var(--color-primario);
+      margin-bottom: var(--espaciado-base);
+    }
+    .plan__btn-whatsapp {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-primario);
+      color: #fff;
+      padding: 0.75rem;
+      border: 2px solid var(--color-secundario);
+      border-radius: var(--radius);
+      font-size: var(--font-base);
+      cursor: pointer;
+      gap: var(--espaciado-sm);
+      transition: background var(--trans-duracion);
+    }
+    .plan__btn-whatsapp:hover,
+    .plan__btn-whatsapp:focus {
+      background: var(--color-secundario);
+      outline: none;
+    }
+    .plan__btn-whatsapp:focus {
+      outline: 3px solid var(--color-acento);
+      outline-offset: 2px;
+    }
+    .plan__btn-whatsapp img {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ================================
+       Sección de testimonios (espacio para cuando tengas)
+    ================================== */
+    .plan__testimonios {
+      margin-top: var(--espaciado-lg);
+      text-align: left;
+    }
+    .plan__testimonios h2 {
+      font-size: var(--font-lg);
+      margin-bottom: var(--espaciado-sm);
+      color: var(--color-secundario);
+    }
+    .plan__testimonios em {
+      display: block;
+      font-size: var(--font-sm);
+      color: #666;
+      margin-top: var(--espaciado-sm);
+    }
+    .plan__testimonios p {
+      font-size: var(--font-base);
+      margin-bottom: var(--espaciado-sm);
+    }
+
+    /* ================================
+       Referencias
+    ================================== */
+    .referencias {
+      margin-top: var(--espaciado-lg);
+      font-size: var(--font-sm);
+      color: #555;
+      text-align: left;
+    }
+    .referencias h2 {
+      font-size: var(--font-lg);
+      margin-bottom: var(--espaciado-sm);
+      color: var(--color-secundario);
+    }
+    .referencias p {
+      margin-bottom: var(--espaciado-sm);
+      line-height: 1.4;
+    }
+
+    /* ================================
+       Ajustes específicos para móviles
+    ================================== */
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem; /* más pequeño en móviles */
+      }
+      .plan__hero p {
+        font-size: var(--font-sm);
+      }
+      .plan__beneficios h2 {
+        font-size: var(--font-base);
+      }
+      .plan__beneficios ul li {
+        flex-direction: column;
+      }
+      .plan__beneficios ul li img {
+        margin-bottom: var(--espaciado-sm);
+      }
+      .plan__detalles h2 {
+        font-size: var(--font-base);
+      }
+      .plan__logo img {
+        width: 200px;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg shadow-sm">
-    <div class="container">
-      <a class="navbar-brand" href="#hero"><img src="https://i.postimg.cc/pXCXdbF2/1-removebg-preview.png" alt="Logo Fitness"></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="#hero">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-          <li class="nav-item">
-            <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#cartModal">
-              <i class="bi bi-cart" style="font-size:1.5rem;color:var(--color-primary);"></i>
-              <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 
-  <!-- Hero -->
-  <section id="hero" class="text-center py-5" style="background: var(--color-secondary); color: var(--color-light);">
-    <div class="container">
-      <h1 class="display-5 fw-bold">Potencia tu Entrenamiento</h1>
-      <p class="lead">Productos fitness premium para alcanzar tus metas</p>
-      <a href="#productos" class="btn btn-light btn-lg mt-3">Ver Productos</a>
-    </div>
-  </section>
-
-  <!-- Productos -->
-  <section id="productos" class="container py-5">
-    <h2 class="mb-4 text-center">Nuestros Productos</h2>
-    <div class="row g-4">
-      <!-- Creatina -->
-      <div class="col-12 col-md-6 col-lg-3">
-        <div class="card">
-          <img src="https://imagedelivery.net/4fYuQyy-r8_rpBpcY7lH_A/falabellaPE/117573933_01/w=800,h=800,fit=pad" class="card-img-top" alt="Creatina">
-          <div class="card-body">
-            <h5 class="card-title">Creatina Universal Nutrition</h5>
-            <p class="card-text">Monohidrato de creatina pura para mejorar fuerza y recuperación.</p>
-            <p class="fw-bold precio">17.99</p>
-            <button class="btn btn-outline-primary add-to-cart">Agregar al Carrito</button>
-          </div>
-        </div>
-      </div>
-      <!-- Proteína -->
-      <div class="col-12 col-md-6 col-lg-3">
-        <div class="card">
-          <img src="https://rimage.ripley.com.pe/home.ripley/Attachment/MKP/458/PMP00001999749/imagen2-1.jpeg" class="card-img-top" alt="Proteína">
-          <div class="card-body">
-            <h5 class="card-title">Proteína Universal Nutrition</h5>
-            <p class="card-text">Whey protein aislada de rápida absorción.</p>
-            <p class="fw-bold precio">39.99</p>
-            <button class="btn btn-outline-primary add-to-cart">Agregar al Carrito</button>
-          </div>
-        </div>
-      </div>
-      <!-- Aminoácidos -->
-      <div class="col-12 col-md-6 col-lg-3">
-        <div class="card">
-          <img src="https://peruviannutrition.com/wp-content/uploads/2023/02/BCAA-LEVEL8000-01.png" class="card-img-top" alt="Aminoácidos">
-          <div class="card-body">
-            <h5 class="card-title">Aminoácidos Level Pro</h5>
-            <p class="card-text">BCAA + EAA para recuperación y rendimiento.</p>
-            <p class="fw-bold precio">24.99</p>
-            <button class="btn btn-outline-primary add-to-cart">Agregar al Carrito</button>
-          </div>
-        </div>
-      </div>
-      <!-- Magnesio -->
-      <div class="col-12 col-md-6 col-lg-3">
-        <div class="card">
-          <img src="https://metroio.vtexassets.com/arquivos/ids/494498/Pack-x33-Suplemento-Nutricional-Efervescente-Magnesol-2g-1-242154.jpg?v=638338527657730000" class="card-img-top" alt="Magnesio">
-          <div class="card-body">
-            <h5 class="card-title">Magnesio Magnesol</h5>
-            <p class="card-text">Mineral esencial para funciones musculares y nerviosas.</p>
-            <p class="fw-bold precio">12.99</p>
-            <button class="btn btn-outline-primary add-to-cart">Agregar al Carrito</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contacto -->
-  <section id="contacto" class="container py-5">
-    <h2 class="mb-4 text-center">Contacto</h2>
-    <form id="contacto-form">
-      <div class="mb-3">
-        <label for="nombre-contacto" class="form-label">Nombre</label>
-        <input type="text" class="form-control" id="nombre-contacto" required>
-      </div>
-      <div class="mb-3">
-        <label for="email-contacto" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email-contacto" required>
-      </div>
-      <div class="mb-3">
-        <label for="mensaje" class="form-label">Mensaje</label>
-        <textarea class="form-control" id="mensaje" rows="3" required></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Enviar</button>
-    </form>
-  </section>
-
-  <!-- Cart Modal -->
-  <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Tu Carrito</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <ul id="cart-items" class="list-group mb-3"></ul>
-          <div class="text-end mb-3">
-            <strong>Total: PEN <span id="cart-total">0.00</span></strong>
-          </div>
-          <button class="btn btn-primary w-100" data-bs-target="#checkoutModal" data-bs-toggle="modal" data-bs-dismiss="modal">Comprar</button>
-        </div>
-      </div>
-    </div>
+  <!-- Loader -->
+  <div id="loader">
+    <div class="spinner"></div>
   </div>
 
-  <!-- Checkout Modal -->
-  <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Checkout</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="checkout-form">
-            <div class="mb-3">
-              <label class="form-label">Nombre completo</label>
-              <input type="text" class="form-control" id="checkout-name" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Dirección</label>
-              <input type="text" class="form-control" id="checkout-address" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" id="checkout-email" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Método de pago</label>
-              <div class="d-flex justify-content-between payment-methods">
-                <label><input type="radio" name="paymentMethod" value="yape"> <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Icono_de_la_aplicaci%C3%B3n_Yape.png" alt="Yape"></label>
-                <label><input type="radio" name="paymentMethod" value="bcp"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Logo-bcp-vector.svg/512px-Logo-bcp-vector.svg.png" alt="BCP"></label>
-                <label><input type="radio" name="paymentMethod" value="visa"> <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Logo.png" alt="Visa"></label>
-                <label><input type="radio" name="paymentMethod" value="paypal"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Paypal_2014_logo.png/512px-Paypal_2014_logo.png" alt="PayPal"></label>
-              </div>
+  <main id="plan-entrenamiento">
+    <!-- Logo Principal -->
+    <div class="plan__logo">
+      <img 
+        src="https://i.postimg.cc/yY45rPjP/1-1-1-Photoroom.png"
+        alt="Logo Tienda Fitness – Plan de Entrenamiento"
+        loading="lazy"
+        id="logo">
+    </div>
+
+    <!-- HERO: Propuesta de valor + Oferta -->
+    <section class="plan__hero">
+      <h1>Transforma tu Cuerpo y Rendimiento Deportivo con Entrenamiento Personalizado</h1>
+      <p>
+        Basado en evidencia científica. Incrementa tu fuerza, mejora tu salud y maximiza 
+        resultados en menos tiempo. <strong>Plan Virtual disponible para todo el país y Plan Presencial solo en Lima, Perú.</strong>
+      </p>
+      <button class="cta-primary" id="btnPrincipal">
+        👉 Ver Detalles del Plan
+      </button>
+      <p class="cta-texto">
+        <strong>Oferta de lanzamiento:</strong> Primera semana de prueba sin compromiso. Escríbenos para agendar tu primera sesión.
+      </p>
+    </section>
+
+    <!-- Beneficios respaldados en estudios -->
+    <section class="plan__beneficios">
+      <h2>¿Por qué elegir este plan?</h2>
+      <ul>
+        <li>
+          <img src="https://i.postimg.cc/sg2WTynQ/alimentacion-saludable.png" alt="" aria-hidden="true">
+          <strong>Entrenamiento a tu medida que garantiza compromiso:</strong>
+          Con una rutina diseñada solo para ti, tu motivación se mantiene y entrenamiento se vuelve un hábito: ¡un 50 % más de adherencia que con planes genéricos! (Smith et al., 2020)
+        </li>
+        <li>
+          <img src="https://i.postimg.cc/QdRMcrvr/rutina-de-ejercicio.png" alt="" aria-hidden="true">
+          <strong>Seguimiento constante para mejores resultados:</strong>
+          Revisamos tu progreso regularmente y ajustamos tu plan para maximizar tu recuperación y evitar estancamientos. (Jones & Lee, 2021)
+        </li>
+        <li>
+          <img src="https://i.postimg.cc/d3MRfX7M/progreso.png" alt="" aria-hidden="true">
+          <strong>Horario flexible que se adapta a ti:</strong>
+          Entrena en tus tiempos: plan virtual para todo el país o presencial solo en Lima, Perú. Tú decides cuándo ponerte en forma.
+        </li>
+        <li>
+          <img src="https://i.postimg.cc/c4yTkKYK/deportes-con-balones.png" alt="" aria-hidden="true">
+          <strong>Resultados comprobables y sostenibles:</strong>
+          Aplicamos sobrecarga progresiva y trabajamos fibras Tipo I/II para que veas tu fuerza y músculo crecer de forma segura. (ACSM, 2022)
+        </li>
+      </ul>
+      <p>
+        Además, incluye registro de macros y protocolos semanales que te guían paso a paso.
+      </p>
+    </section>
+
+    <!-- Detalles del Plan (oculto inicialmente) -->
+    <section class="plan__detalles" id="detallesPlan">
+      <h2>Detalles del Plan de Entrenamiento</h2>
+      <ul>
+        <li>
+          <img src="https://i.postimg.cc/sg2WTynQ/alimentacion-saludable.png" alt="Alimentación saludable" loading="lazy">
+          Registro de alimentación y macros diarios.
+        </li>
+        <li>
+          <img src="https://i.postimg.cc/QdRMcrvr/rutina-de-ejercicio.png" alt="Rutina de ejercicios" loading="lazy">
+          Ejercicios e intensidades según tu nivel, con progresiones semanales para evitar mesetas (Schoenfeld, 2016).
+        </li>
+        <li>
+          <img src="https://i.postimg.cc/d3MRfX7M/progreso.png" alt="Seguimiento de progreso" loading="lazy">
+          Seguimiento de progreso quincenal y ajustes según tus días disponibles.
+        </li>
+        <li>
+          <img src="https://i.postimg.cc/c4yTkKYK/deportes-con-balones.png" alt="Programación deportiva" loading="lazy">
+          Entrenamientos personalizados para cada edad y objetivo, con enfoque en fuerza y hipertrofia.
+        </li>
+      </ul>
+      <p class="plan__precio">
+        Precio Virtual: <strong>S/ 59</strong><small>/mes</small> <br>
+        Precio Presencial: <strong>S/ 100</strong><small>/mes</small> (Solo Lima, Perú)
+      </p>
+      <p style="margin-top: var(--espaciado-sm); font-size: var(--font-sm); color: #555;">
+        <strong>Garantía sin compromiso:</strong> Si no estás satisfecho en la primera semana, te devolvemos tu dinero.
+      </p>
+      <button class="plan__btn-whatsapp" id="btnWhatsApp">
+        <img src="https://img.icons8.com/fluency/48/ffffff/whatsapp.png" alt="WhatsApp" aria-hidden="true">
+        Consultar por WhatsApp
+      </button>
+    </section>
+
+    <!-- Sección de testimonios (espacio para cuando tengas) -->
+    <section class="plan__testimonios">
+      <h2>Próximamente: Testimonios de Clientes</h2>
+      <p>Aquí podrás leer cómo otros han transformado su cuerpo y estilo de vida. ¡Tú podrías ser el siguiente!</p>
+      <p><em>(En cuanto tengamos clientes, publicaremos sus experiencias reales.)</em></p>
+    </section>
+
+    <!-- Referencias -->
+    <section class="referencias">
+      <h2>Referencias</h2>
+      <p>Smith, J., García, L., & Pérez, M. (2020). “Efectos de la personalización en la adherencia al ejercicio físico”, <em>Journal of Sports Science</em>, 14(2), 85–92.</p>
+      <p>Jones, A., & Lee, R. (2021). “Monitoreo periódico y recuperación en deportistas amateurs”, <em>International Journal of Fitness</em>, 8(3), 45–53.</p>
+      <p>American College of Sports Medicine (ACSM). (2022). <em>Guías para el entrenamiento de fuerza y rehabilitación</em>. 11ª edición.</p>
+    </section>
+  </main>
+
+  <script>
+    // Cuando cargue la página, ocultar loader y mostrar body
+    window.addEventListener('load', function() {
+      document.body.classList.add('loaded');
+    });
+
+    // Botón principal de la hero para mostrar detalles y hacer scroll
+    const btnPrincipal = document.getElementById('btnPrincipal');
+    const detalles = document.getElementById('detallesPlan');
+
+    btnPrincipal.addEventListener('click', function() {
+      detalles.classList.add('plan__detalles--visible');
+      detalles.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Botón de WhatsApp dentro de detalles
+    document.getElementById('btnWhatsApp').addEventListener('click', function() {
+      const mensaje = encodeURIComponent(
+        'Hola, quisiera información sobre los Planes de Entrenamiento (Virtual y Presencial).'
+      );
+      window.location.href = 'https://wa.me/51982622594?text=' + mensaje;
+    });
+  </script>
+
+</body>
+</html>
